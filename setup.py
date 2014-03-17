@@ -10,5 +10,5 @@ setup(
     author='Frank Tobia',
     author_email='frank.tobia@gmail.com',
     url='https://github.com/ftobia/pytest-ordering',
-    packages=['pytest_ordering'],
+    py_modules=['pytest_ordering'],
 )
