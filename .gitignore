@@ -22,6 +22,9 @@ __pycache__
 # Virtualenvs
 env
 
+# Sphinx documentation
+docs/build
+
 # Installer logs
 pip-log.txt
 
