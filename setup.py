@@ -11,4 +11,10 @@ setup(
     author_email='frank.tobia@gmail.com',
     url='https://github.com/ftobia/pytest-ordering',
     py_modules=['pytest_ordering'],
+    entry_points = {
+        'pytest11': [
+            'pytest_ordering = pytest_ordering',
+        ]
+    },
+    install_requires=['pytest'],
 )
