@@ -11,7 +11,7 @@ __here__ = os.path.dirname(os.path.abspath(__file__))
 
 
 def get_module(module_name):
-    return __import__(module_name, globals(), locals(), [], -1)
+    return __import__(module_name, globals(), locals(), [], 1)
 
 
 def get_tests(module_name):
@@ -20,7 +20,7 @@ def get_tests(module_name):
 
 
 def _names_of_tests(output, test_file_name):
-    regex = r'^{}:(\d+): test_([a-z]) PASSED$'.format(
+    regex = r'^{0}:(\d+): test_([a-z]) PASSED$'.format(
         test_file_name.replace('.', '\.'))
     for line in output.split('\n'):
         match = re.match(regex, line)
@@ -40,7 +40,7 @@ def get_order(output, test_file_name):
 ])
 def test_ordering(module_name, capsys):
     module = get_module(module_name)
-    pytest.main('{}/{}.py -vv'.format(__here__, module_name))
-    relative_filename = 'tests/{}.py'.format(module_name)
+    pytest.main('{0}/{1}.py -vv'.format(__here__, module_name))
+    relative_filename = 'tests/{0}.py'.format(module_name)
     out, err = capsys.readouterr()
     assert list(module.ordering) == get_order(out, relative_filename)
