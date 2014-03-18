@@ -11,7 +11,7 @@ __here__ = os.path.dirname(os.path.abspath(__file__))
 
 
 def get_module(module_name):
-    return __import__(module_name, globals(), locals(), [], -1)
+    return __import__(module_name, globals(), locals(), [], 1)
 
 
 def get_tests(module_name):
