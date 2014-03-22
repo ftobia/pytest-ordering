@@ -1,16 +1,24 @@
 #!/usr/bin/env python
 
 from setuptools import setup
+import os
+
+__here__ = os.path.abspath(os.path.dirname(__file__))
+
+# define __version__
+# execfile doesn't exist in python 3
+# see: http://stackoverflow.com/questions/6357361/alternative-to-execfile-in-python-3-2
+exec(open(os.path.join(__here__, 'pytest_ordering', '_version.py')).read())
 
 
 setup(
     name='pytest-ordering',
     description='pytest plugin to run your tests in a specific order',
-    version='0.2',
+    version=__version__,
     author='Frank Tobia',
     author_email='frank.tobia@gmail.com',
     url='https://github.com/ftobia/pytest-ordering',
-    py_modules=['pytest_ordering'],
+    packages=['pytest_ordering'],
     entry_points = {
         'pytest11': [
             'pytest_ordering = pytest_ordering',

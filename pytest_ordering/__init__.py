@@ -1,5 +1,8 @@
 import re
 
+from ._version import __version__
+
+
 replacements = {
     'first': 0,
     'second': 1,

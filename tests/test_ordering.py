@@ -5,7 +5,7 @@ import re
 
 import pytest
 
-from pytest_ordering import _order_tests
+import pytest_ordering
 
 __here__ = os.path.dirname(os.path.abspath(__file__))
 
@@ -44,3 +44,8 @@ def test_ordering(module_name, capsys):
     relative_filename = 'tests/{0}.py'.format(module_name)
     out, err = capsys.readouterr()
     assert list(module.ordering) == get_order(out, relative_filename)
+
+
+def test_version():
+    assert hasattr(pytest_ordering, '__version__')
+    assert re.match(r'[0-9]+\.[0-9]+(\.[0-9]+)?$', pytest_ordering.__version__)
