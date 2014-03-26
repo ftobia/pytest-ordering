@@ -35,8 +35,7 @@ def get_order(output, test_file_name):
 # Default sorting is whatever order the tests show up in the module.
 
 @pytest.mark.parametrize('module_name', [
-    'numbers', 'words', 'words_backwards',
-    # 'grouping', # This one is going to be tricky.
+    'numbers', 'words', 'words_backwards', 'grouping',
 ])
 def test_ordering(module_name, capsys):
     module = get_module(module_name)

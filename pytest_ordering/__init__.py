@@ -26,16 +26,22 @@ def pytest_collection_modifyitems(session, config, items):
     items[:] = list(_order_tests(items))
 
 
-def orderable(marker):
-    match = re.match('^order(\d+)$', marker)
-    return bool(match) or marker in replacements
+def orderable(marker_name, marker_info):
+    if not hasattr(marker_info, 'kwargs'):
+        return False
+    if 'order' in marker_info.kwargs:
+        return True
+    match = re.match('^order(\d+)$', marker_name)
+    return bool(match) or marker_name in replacements
 
 
-def get_index(marker):
-    match = re.match('^order(\d+)$', marker)
+def get_index(marker_name, marker_info):
+    match = re.match('^order(\d+)$', marker_name)
     if match:
         return int(match.group(1)) - 1
-    return replacements[marker]
+    if marker_name in replacements:
+        return replacements[marker_name]
+    return marker_info.kwargs['order']
 
 
 def split(dictionary):
@@ -54,10 +60,11 @@ def _order_tests(tests):
     for test in tests:
         # There has got to be an API for this. :-/
         markers = test.keywords.__dict__['_markers']
-        orderable_markers = [m for m in markers if orderable(m)]
+        orderable_markers = [(k, v) for (k, v) in markers.items()
+                             if orderable(k, v)]
         if len(orderable_markers) == 1:
-            [orderable_marker] = orderable_markers
-            ordered_tests[get_index(orderable_marker)] = test
+            marker_name, marker_info = orderable_markers[0]
+            ordered_tests[get_index(marker_name, marker_info)] = test
         else:
             remaining_tests.append(test)
     from_beginning, from_end = split(ordered_tests)
