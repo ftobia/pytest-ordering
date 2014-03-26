@@ -45,6 +45,11 @@ def test_ordering(module_name, capsys):
     assert list(module.ordering) == get_order(out, relative_filename)
 
 
+def test_run_marker_registered(capsys):
+    pytest.main('--markers')
+    out, err = capsys.readouterr()
+    assert '@pytest.mark.run' in out
+
 def test_version():
     assert hasattr(pytest_ordering, '__version__')
     assert re.match(r'[0-9]+\.[0-9]+(\.[0-9]+)?$', pytest_ordering.__version__)

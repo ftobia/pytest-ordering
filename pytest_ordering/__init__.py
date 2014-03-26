@@ -22,6 +22,18 @@ replacements = {
     'eighth_to_last': -8,
 }
 
+
+def pytest_configure(config):
+    """Register the "run" marker.
+    """
+    config_line = (
+        'run: specify ordering information for when tests should run '
+        'in relation to one another. Provided by pytest-ordering. '
+        'See also: http://pytest-ordering.readthedocs.org/'
+    )
+    config.addinivalue_line('markers', config_line)
+
+
 def pytest_collection_modifyitems(session, config, items):
     items[:] = list(_order_tests(items))
 
