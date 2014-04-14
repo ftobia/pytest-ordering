@@ -5,25 +5,27 @@ pytest plugin to run your tests in a specific order
 
 [![Build Status](https://travis-ci.org/ftobia/pytest-ordering.svg?branch=develop)](https://travis-ci.org/ftobia/pytest-ordering)
 
-Have you ever wanted to easily run one of your tests before any others run? Or run some tests last? Or run this one test before this one other test? Or make sure that this group of tests runs after this other group of tests?
+Have you ever wanted to easily run one of your tests before any others run?
+Or run some tests last? Or run this one test before that other test? Or
+make sure that this group of tests runs after this other group of tests?
 
 Now you can.
 
 Install with:
 
     pip install pytest-ordering
-    
+
 This defines some pytest markers that you can use in your code.
 
 For example, this:
 
     import pytest
 
-    @pytest.mark.order2
+    @pytest.mark.run(order=2)
     def test_foo():
         assert True
 
-    @pytest.mark.order1
+    @pytest.mark.run(order=1)
     def test_bar():
         assert True
 
