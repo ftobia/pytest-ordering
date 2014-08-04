@@ -43,12 +43,12 @@ def orderable(marker_name, marker_info):
         return False
     if 'order' in marker_info.kwargs:
         return True
-    match = re.match('^order(\d+)$', marker_name)
+    match = re.search('(\d+)$', marker_name)
     return bool(match) or marker_name in replacements
 
 
 def get_index(marker_name, marker_info):
-    match = re.match('^order(\d+)$', marker_name)
+    match = re.search('(\d+)$', marker_name)
     if match:
         return int(match.group(1)) - 1
     if marker_name in replacements:
