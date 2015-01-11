@@ -1,3 +1,5 @@
+from ._version import __version__
+
 import re
 from collections import defaultdict
 
