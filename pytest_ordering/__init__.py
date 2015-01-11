@@ -1,7 +1,5 @@
 import re
-
-from ._version import __version__
-
+from collections import defaultdict
 
 replacements = {
     'first': 0,
@@ -67,7 +65,7 @@ def split(dictionary):
 
 
 def _order_tests(tests):
-    ordered_tests = {}
+    ordered_tests = defaultdict(list)
     remaining_tests = []
     for test in tests:
         # There has got to be an API for this. :-/
@@ -76,20 +74,22 @@ def _order_tests(tests):
                              if orderable(k, v)]
         if len(orderable_markers) == 1:
             marker_name, marker_info = orderable_markers[0]
-            ordered_tests[get_index(marker_name, marker_info)] = test
+            ordered_tests[get_index(marker_name, marker_info)].append(test)
         else:
             remaining_tests.append(test)
     from_beginning, from_end = split(ordered_tests)
     remaining_iter = iter(remaining_tests)
     for i in range(max(from_beginning or [-1]) + 1):
         if i in from_beginning:
-            yield from_beginning[i]
+            for e in from_beginning[i]:
+                yield e
         else:
             yield next(remaining_iter)
     # TODO TODO TODO
     for i in range(min(from_end or [0]), 0):
         if i in from_end:
-            yield from_end[i]
+            for e in from_end[i]:
+                yield e
         else:
             yield next(remaining_iter)
     for test in remaining_iter:
