@@ -92,7 +92,7 @@ def _order_tests(tests):
             yield test
 
     # run test from end
-    for test_order in sorted(from_end, reverse=True):
+    for test_order in sorted(from_end):
         for test in from_end[test_order]:
             yield test
 
