@@ -24,8 +24,8 @@ replacements = {
 
 
 def pytest_configure(config):
-    """Register the "run" marker.
-    """
+    """Register the "run" marker."""
+
     config_line = (
         'run: specify ordering information for when tests should run '
         'in relation to one another. Provided by pytest-ordering. '
@@ -41,19 +41,22 @@ def pytest_collection_modifyitems(session, config, items):
 def orderable(marker_name, marker_info):
     if not hasattr(marker_info, 'kwargs'):
         return False
-    if 'order' in marker_info.kwargs:
+    elif 'order' in marker_info.kwargs:
         return True
-    match = re.match('^order(\d+)$', marker_name)
-    return bool(match) or marker_name in replacements
+    else:
+        match = re.match('^order(\d+)$', marker_name)
+        return bool(match) or marker_name in replacements
 
 
 def get_index(marker_name, marker_info):
     match = re.match('^order(\d+)$', marker_name)
+
     if match:
         return int(match.group(1)) - 1
-    if marker_name in replacements:
+    elif marker_name in replacements:
         return replacements[marker_name]
-    return marker_info.kwargs['order']
+    else:
+        return marker_info.kwargs['order']
 
 
 def split(dictionary):
@@ -69,6 +72,7 @@ def split(dictionary):
 def _order_tests(tests):
     ordered_tests = defaultdict(list)
     remaining_tests = []
+
     for test in tests:
         # There has got to be an API for this. :-/
         markers = test.keywords.__dict__['_markers']
@@ -79,20 +83,18 @@ def _order_tests(tests):
             ordered_tests[get_index(marker_name, marker_info)].append(test)
         else:
             remaining_tests.append(test)
+
     from_beginning, from_end = split(ordered_tests)
-    remaining_iter = iter(remaining_tests)
-    for i in range(max(from_beginning or [-1]) + 1):
-        if i in from_beginning:
-            for e in from_beginning[i]:
-                yield e
-        else:
-            yield next(remaining_iter)
-    # TODO TODO TODO
-    for i in range(min(from_end or [0]), 0):
-        if i in from_end:
-            for e in from_end[i]:
-                yield e
-        else:
-            yield next(remaining_iter)
-    for test in remaining_iter:
+
+    # run test from beginning
+    for test_order in sorted(from_beginning):
+        for test in from_beginning[test_order]:
+            yield test
+
+    # run test from end
+    for test_order in sorted(from_end, reverse=True):
+        for test in from_end[test_order]:
+            yield test
+
+    for test in remaining_tests:
         yield test
