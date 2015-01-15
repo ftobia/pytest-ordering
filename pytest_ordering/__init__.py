@@ -85,16 +85,22 @@ def _order_tests(tests):
             remaining_tests.append(test)
 
     from_beginning, from_end = split(ordered_tests)
+    remaining_iter = iter(remaining_tests)
 
-    # run test from beginning
-    for test_order in sorted(from_beginning):
-        for test in from_beginning[test_order]:
-            yield test
+    for i in range(max(from_beginning or [-1]) + 1):
+        if i in from_beginning:
+            for test in from_beginning[i]:
+                yield test
+        else:
+            yield next(remaining_iter)
 
-    # run test from end
-    for test_order in sorted(from_end):
-        for test in from_end[test_order]:
-            yield test
+    # TODO TODO TODO
+    for i in range(min(from_end or [0]), 0):
+        if i in from_end:
+            for test in from_end[i]:
+                yield test
+        else:
+            yield next(remaining_iter)
 
-    for test in remaining_tests:
+    for test in remaining_iter:
         yield test

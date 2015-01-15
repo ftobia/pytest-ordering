@@ -3,11 +3,11 @@ import re
 import pytest
 
 import pytest_ordering
-from . import numbers, words, words_backwards, grouping
+from . import numbers, words, words_backwards, grouping, marked_classes
 
 
 @pytest.mark.parametrize('module', [
-    numbers, words, words_backwards, grouping,
+    numbers, words, words_backwards, grouping, marked_classes
 ])
 def test_ordered_tests(module, testdir):
     items = testdir.getitems(module)
