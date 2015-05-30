@@ -1,27 +1,73 @@
-import re
+# -*- coding: utf-8 -*-
+
+__author__ = "svchipiga@yandex-team.ru"
 
 import pytest
 
-import pytest_ordering
-from . import numbers, words, words_backwards, grouping, marked_classes
+pytest_plugins = ["pytester"]
 
 
-@pytest.mark.parametrize('module', [
-    numbers, words, words_backwards, grouping, marked_classes
-])
-def test_ordered_tests(module, testdir):
-    items = testdir.getitems(module)
-    ordered_tests = list(pytest_ordering._order_tests(items))
-    ordered_letters = [item.name[-1] for item in ordered_tests]
-    assert ordered_letters == list(module.ordering)
+@pytest.fixture
+def item_names_for(testdir):
+
+    def _item_names_for(tests_content):
+        # some strange code to extract sorted items
+        items = testdir.getitems(tests_content)
+        hook = testdir.config.hook
+        hook.pytest_collection_modifyitems(session=items[0].session,
+                                           config=testdir.config, items=items)
+        return [item.name for item in items]
+
+    return _item_names_for
 
 
-def test_run_marker_registered(capsys):
-    pytest.main('--markers')
-    out, err = capsys.readouterr()
-    assert '@pytest.mark.run' in out
+def test_no_marks(item_names_for):
+    tests_content = """
+    def test_1(): pass
+
+    def test_2(): pass
+    """
+
+    assert ['test_1', 'test_2'] == item_names_for(tests_content)
 
 
-def test_version():
-    assert hasattr(pytest_ordering, '__version__')
-    assert re.match(r'[0-9]+\.[0-9]+(\.[0-9]+)?$', pytest_ordering.__version__)
+def test_first_mark(item_names_for):
+    tests_content = """
+    import pytest
+
+    def test_1(): pass
+
+    @pytest.mark.first
+    def test_2(): pass
+    """
+
+    assert ['test_2', 'test_1'] == item_names_for(tests_content)
+
+
+def test_last_mark(item_names_for):
+    tests_content = """
+    import pytest
+
+    @pytest.mark.last
+    def test_1(): pass
+
+    def test_2(): pass
+    """
+
+    assert ['test_2', 'test_1'] == item_names_for(tests_content)
+
+
+def test_first_last_marks(item_names_for):
+    tests_content = """
+    import pytest
+
+    @pytest.mark.last
+    def test_1(): pass
+
+    @pytest.mark.first
+    def test_2(): pass
+
+    def test_3(): pass
+    """
+
+    assert ['test_2', 'test_3', 'test_1'] == item_names_for(tests_content)

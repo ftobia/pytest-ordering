@@ -1,9 +1,10 @@
-from ._version import __version__
+# -*- coding: utf-8 -*-
 
-import re
-from collections import defaultdict
+__author__ = 'svchipiga@yandex-team.ru'
 
-replacements = {
+import pytest
+
+orders_map = {
     'first': 0,
     'second': 1,
     'third': 2,
@@ -35,72 +36,44 @@ def pytest_configure(config):
 
 
 def pytest_collection_modifyitems(session, config, items):
-    items[:] = list(_order_tests(items))
+    grouped_items = {}
 
+    for item in items:
 
-def orderable(marker_name, marker_info):
-    if not hasattr(marker_info, 'kwargs'):
-        return False
-    elif 'order' in marker_info.kwargs:
-        return True
-    else:
-        match = re.match('^order(\d+)$', marker_name)
-        return bool(match) or marker_name in replacements
+        for mark_name, order in orders_map.items():
+            mark = item.get_marker(mark_name)
 
+            if mark:
+                item.add_marker(pytest.mark.run(order=order))
+                break
 
-def get_index(marker_name, marker_info):
-    match = re.match('^order(\d+)$', marker_name)
+        mark = item.get_marker('run')
 
-    if match:
-        return int(match.group(1)) - 1
-    elif marker_name in replacements:
-        return replacements[marker_name]
-    else:
-        return marker_info.kwargs['order']
-
-
-def split(dictionary):
-    from_beginning, from_end = {}, {}
-    for key, val in dictionary.items():
-        if key >= 0:
-            from_beginning[key] = val
+        if mark:
+            order = mark.kwargs.get('order')
         else:
-            from_end[key] = val
-    return from_beginning, from_end
+            order = None
 
+        grouped_items.setdefault(order, []).append(item)
 
-def _order_tests(tests):
-    ordered_tests = defaultdict(list)
-    remaining_tests = []
+    if grouped_items:
+        unordered_items = grouped_items.pop(None) if None in grouped_items else None
 
-    for test in tests:
-        # There has got to be an API for this. :-/
-        markers = test.keywords.__dict__['_markers']
-        orderable_markers = [(k, v) for (k, v) in markers.items()
-                             if orderable(k, v)]
-        if len(orderable_markers) == 1:
-            marker_name, marker_info = orderable_markers[0]
-            ordered_tests[get_index(marker_name, marker_info)].append(test)
-        else:
-            remaining_tests.append(test)
+        sorted_items = []
+        prev_key = 0
 
-    from_beginning, from_end = split(ordered_tests)
-    remaining_iter = iter(remaining_tests)
+        for key, ordered_items in grouped_items.items():
 
-    for i in range(max(from_beginning or [-1]) + 1):
-        if i in from_beginning:
-            for test in from_beginning[i]:
-                yield test
-        else:
-            yield next(remaining_iter)
+            if unordered_items and prev_key >= 0 and key < 0:
 
-    # TODO TODO TODO
-    for i in range(min(from_end or [0]), 0):
-        if i in from_end:
-            for test in from_end[i]:
-                yield test
-        else:
-            yield next(remaining_iter)
+                sorted_items.extend(unordered_items)
+                unordered_items = None
 
-    for test in remaining_iter:
-        yield test
+            prev_key = key
+
+            sorted_items.extend(ordered_items)
+
+        if unordered_items:
+            sorted_items.extend(unordered_items)
+
+        items[:] = sorted_items
