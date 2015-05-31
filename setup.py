@@ -26,7 +26,7 @@ setup(
     },
     install_requires=['pytest'],
     classifiers=[
-        'Development Status :: Stable',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: POSIX',

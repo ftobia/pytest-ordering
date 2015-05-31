@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-__author__ = 'svchipiga@yandex-team.ru'
-
 import pytest
 
 orders_map = {
@@ -57,7 +55,7 @@ def pytest_collection_modifyitems(session, config, items):
         grouped_items.setdefault(order, []).append(item)
 
     if grouped_items:
-        unordered_items = grouped_items.pop(None) if None in grouped_items else None
+        unordered_items = grouped_items.pop(None, None)
 
         sorted_items = []
         prev_key = 0
