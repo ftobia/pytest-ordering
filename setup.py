@@ -8,7 +8,7 @@ __here__ = os.path.abspath(os.path.dirname(__file__))
 # define __version__
 # execfile doesn't exist in python 3
 # see: http://stackoverflow.com/questions/6357361/alternative-to-execfile-in-python-3-2
-exec(open(os.path.join(__here__, 'pytest_ordering', 'version.py')).read())
+exec(open(os.path.join(__here__, 'pytest_ordering', '_version.py')).read())
 
 
 setup(
