@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
-
 import re
 
 import pytest
-import pytest_ordering.author
-import pytest_ordering.version
 
-pytest_plugins = ["pytester"]
+pytest_plugins = ['pytester']
 
 
 @pytest.fixture
@@ -187,12 +184,3 @@ def test_run_marker_registered(capsys):
     pytest.main('--markers')
     out, err = capsys.readouterr()
     assert '@pytest.mark.run' in out
-
-
-def test_version_valid():
-    assert re.match(r'[0-9]+\.[0-9]+(\.[0-9]+)?$',
-                    pytest_ordering.version.__version__)
-
-
-def test_author_present():
-    assert hasattr(pytest_ordering.author, '__author__')
