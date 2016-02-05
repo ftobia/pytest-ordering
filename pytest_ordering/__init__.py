@@ -113,14 +113,18 @@ def pytest_collection_modifyitems(session, config, items):
         elif prev_cls is not None and prev_cls != current_cls:
             # arranging the items of same class i.e. items_cls and adding to grouped_items
             for elem in group_class_items_by_order(items_cls):
-                elem_scope, elem_order = get_markerrun_scope_and_order(item)
+                elem_scope, elem_order = get_markerrun_scope_and_order(elem)
 
                 if elem_scope == 'class':
                     # ignoring items whose scope is defined as its already processed
                     grouped_items.setdefault(None, []).append(elem)
                 else:
                     grouped_items.setdefault(elem_order, []).append(elem)
-            items_cls[:] = [item]
+            if current_cls is not None:
+                items_cls[:] = [item]
+            else:
+                items_cls[:] = []
+                grouped_items.setdefault(order, []).append(item)
         else:
             grouped_items.setdefault(order, []).append(item)
 
