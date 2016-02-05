@@ -179,6 +179,33 @@ def test_order_mark_class(item_names_for):
 
     assert item_names_for(tests_content) == ['test_3', 'test_4', 'test_5', 'test_1', 'test_2']
 
+def test_order_mark_scope_class(item_names_for):
+    tests_content = """
+    import pytest
+
+    
+    class TestLast(object):
+
+        @pytest.mark.run(scope='class', order=-1)
+        def test_1(self): pass
+
+        def test_2(self): pass
+
+
+    @pytest.mark.run(order=0)
+    def test_3(): pass
+
+
+    @pytest.mark.run(order=-2)
+    class TestFirst(object):
+
+        def test_4(self): pass
+
+        def test_5(self): pass
+    """
+
+    assert item_names_for(tests_content) == ['test_3', 'test_2', 'test_1', 'test_4', 'test_5']
+
 
 def test_run_marker_registered(capsys):
     pytest.main('--markers')
