@@ -56,23 +56,15 @@ def pytest_collection_modifyitems(session, config, items):
         grouped_items.setdefault(order, []).append(item)
 
     if grouped_items:
-        unordered_items = grouped_items.pop(None, None)
-
         sorted_items = []
-        prev_key = 0
 
-        for key, ordered_items in grouped_items.items():
+        unordered_items = [grouped_items.pop(None, [])]
 
-            if unordered_items and prev_key >= 0 and key < 0:
+        start_list = sorted((i for i in grouped_items.items() if i[0] >= 0), key=lambda x: x[0])
+        end_list = sorted((i for i in grouped_items.items() if i[0] < 0), key=lambda x: x[0])
 
-                sorted_items.extend(unordered_items)
-                unordered_items = None
+        sorted_items.extend([i[1] for i in start_list])
+        sorted_items.extend(unordered_items)
+        sorted_items.extend([i[1] for i in end_list])
 
-            prev_key = key
-
-            sorted_items.extend(ordered_items)
-
-        if unordered_items:
-            sorted_items.extend(unordered_items)
-
-        items[:] = sorted_items
+        items[:] = [item for sublist in sorted_items for item in sublist]
