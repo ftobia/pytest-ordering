@@ -89,6 +89,94 @@ def test_order_marks(item_names_for):
     assert item_names_for(tests_content) == ['test_3', 'test_2', 'test_1']
 
 
+def test_non_contiguous_positive(item_names_for):
+    tests_content = """
+    import pytest
+
+    @pytest.mark.run(order=10)
+    def test_1(): pass
+
+    @pytest.mark.run(order=20)
+    def test_2(): pass
+
+    @pytest.mark.run(order=5)
+    def test_3(): pass
+    """
+
+    assert item_names_for(tests_content) == ['test_3', 'test_1', 'test_2']
+
+
+def test_non_contiguous_negative(item_names_for):
+    tests_content = """
+    import pytest
+
+    @pytest.mark.run(order=-10)
+    def test_1(): pass
+
+    @pytest.mark.run(order=-20)
+    def test_2(): pass
+
+    @pytest.mark.run(order=-5)
+    def test_3(): pass
+    """
+
+    assert item_names_for(tests_content) == ['test_2', 'test_1', 'test_3']
+
+
+def test_non_contiguous_inc_zero(item_names_for):
+    tests_content = """
+    import pytest
+
+    @pytest.mark.run(order=10)
+    def test_1(): pass
+
+    @pytest.mark.run(order=20)
+    def test_2(): pass
+
+    @pytest.mark.run(order=5)
+    def test_3(): pass
+
+    @pytest.mark.run(order=-10)
+    def test_4(): pass
+
+    @pytest.mark.run(order=-20)
+    def test_5(): pass
+
+    @pytest.mark.run(order=-5)
+    def test_6(): pass
+
+    @pytest.mark.run(order=0)
+    def test_7(): pass
+    """
+
+    assert item_names_for(tests_content) == ['test_7', 'test_3', 'test_1', 'test_2', 'test_5', 'test_4', 'test_6']
+
+
+def test_non_contiguous_inc_none(item_names_for):
+    tests_content = """
+    import pytest
+
+    @pytest.mark.run(order=5)
+    def test_1(): pass
+
+    @pytest.mark.run(order=0)
+    def test_2(): pass
+
+    @pytest.mark.run(order=1)
+    def test_3(): pass
+
+    @pytest.mark.run(order=-1)
+    def test_4(): pass
+
+    @pytest.mark.run(order=-5)
+    def test_5(): pass
+
+    def test_6(): pass
+    """
+
+    assert item_names_for(tests_content) == ['test_2', 'test_3', 'test_1', 'test_6', 'test_5', 'test_4']
+
+
 def test_first_mark_class(item_names_for):
     tests_content = """
     import pytest
