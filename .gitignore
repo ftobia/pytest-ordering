@@ -40,3 +40,6 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Misc
+.cache
