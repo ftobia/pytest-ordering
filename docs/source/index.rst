@@ -13,9 +13,9 @@ second-to-last) or relative (i.e. run this test before this other test).
 
 .. note :: pytest-ordering is currently alpha-quality software. Notably,
  some of this documentation may be aspirational in nature. If something
- you read here isn't currently implemented, rest assured that I am working
- on it (or feel free to ping me: https://github.com/ftobia)
-
+ you read here isn't currently implemented, you can indicate your interest
+ by filing a github issue (https://github.com/ftobia) or send a pull
+ request of your own.
 
 Quickstart
 ----------
@@ -51,11 +51,11 @@ With pytest-ordering, you can change the default ordering as follows:
 
  import pytest
 
- @pytest.mark.order2
+ @pytest.mark.run(order=2)
  def test_foo():
      assert True
 
- @pytest.mark.order1
+ @pytest.mark.run(order=1)
  def test_bar():
      assert True
 
@@ -115,6 +115,45 @@ You can also use markers such as "first", "second", "last", and "second_to_last"
     =========================== 4 passed in 0.02 seconds ===========================
 
 
+By number
+---------
+
+.. code:: python
+
+ import pytest
+
+ @pytest.mark.run(order=-2)
+ def test_three():
+     assert True
+
+ @pytest.mark.run(order=-1)
+ def test_four():
+     assert True
+
+ @pytest.mark.run(order=2)
+ def test_two():
+     assert True
+
+ @pytest.mark.run(order=1)
+ def test_one():
+     assert True
+
+::
+
+    $ py.test test_foo.py -vv
+    ============================= test session starts ==============================
+    platform darwin -- Python 2.7.5 -- py-1.4.20 -- pytest-2.5.2 -- env/bin/python
+    plugins: ordering
+    collected 4 items
+
+    test_foo.py:17: test_one PASSED
+    test_foo.py:12: test_two PASSED
+    test_foo.py:3: test_three PASSED
+    test_foo.py:7: test_four PASSED
+
+    =========================== 4 passed in 0.02 seconds ===========================
+
+
 Aspirational
 ============
 
@@ -141,45 +180,6 @@ Ordinals
      assert True
 
  @pytest.mark.run('first')
- def test_one():
-     assert True
-
-::
-
-    $ py.test test_foo.py -vv
-    ============================= test session starts ==============================
-    platform darwin -- Python 2.7.5 -- py-1.4.20 -- pytest-2.5.2 -- env/bin/python
-    plugins: ordering
-    collected 4 items
-
-    test_foo.py:17: test_one PASSED
-    test_foo.py:12: test_two PASSED
-    test_foo.py:3: test_three PASSED
-    test_foo.py:7: test_four PASSED
-
-    =========================== 4 passed in 0.02 seconds ===========================
-
-
-By number
----------
-
-.. code:: python
-
- import pytest
-
- @pytest.mark.run(order=-2)
- def test_three():
-     assert True
-
- @pytest.mark.run(order=-1)
- def test_four():
-     assert True
-
- @pytest.mark.run(order=2)
- def test_two():
-     assert True
-
- @pytest.mark.run(order=1)
  def test_one():
      assert True
 
