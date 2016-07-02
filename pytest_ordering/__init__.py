@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from ._version import __version__
 
+import operator
+
 import pytest
 
 orders_map = {
@@ -55,16 +57,16 @@ def pytest_collection_modifyitems(session, config, items):
 
         grouped_items.setdefault(order, []).append(item)
 
-    if grouped_items:
-        sorted_items = []
+    sorted_items = []
+    unordered_items = [grouped_items.pop(None, [])]
 
-        unordered_items = [grouped_items.pop(None, [])]
+    start_list = sorted((i for i in grouped_items.items() if i[0] >= 0),
+                        key=operator.itemgetter(0))
+    end_list = sorted((i for i in grouped_items.items() if i[0] < 0),
+                      key=operator.itemgetter(0))
 
-        start_list = sorted((i for i in grouped_items.items() if i[0] >= 0), key=lambda x: x[0])
-        end_list = sorted((i for i in grouped_items.items() if i[0] < 0), key=lambda x: x[0])
+    sorted_items.extend([i[1] for i in start_list])
+    sorted_items.extend(unordered_items)
+    sorted_items.extend([i[1] for i in end_list])
 
-        sorted_items.extend([i[1] for i in start_list])
-        sorted_items.extend(unordered_items)
-        sorted_items.extend([i[1] for i in end_list])
-
-        items[:] = [item for sublist in sorted_items for item in sublist]
+    items[:] = [item for sublist in sorted_items for item in sublist]
