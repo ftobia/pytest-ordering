@@ -175,7 +175,7 @@ def pytest_collection_modifyitems(session, config, items):
         for label, entry in before_item.items():
             sys.stdout.write( label + " ")
             sorted_list += entry
-        for label, entry in end_item.items():
+        for label, entry in after_item.items():
             sys.stdout.write( label + " ")
             sorted_list += entry
         sys.flush()
