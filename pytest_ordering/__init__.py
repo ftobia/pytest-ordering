@@ -54,7 +54,7 @@ def mark_binning(item, keys, start, end, before, after, unordered):
         order = mark.kwargs.get('order')
         before_mark = mark.kwargs.get('before')
         after_mark = mark.kwargs.get('after')
-        if order:
+        if order is not None:
             order = int(order)
             if order < 0:
                 end.setdefault(order, []).append(item)
@@ -160,7 +160,6 @@ def pytest_collection_modifyitems(session, config, items):
             del after_item[label]
 
         length = len(before_item) + len(after_item)
-    index = 1
-    print()
+    
     items[:] = sorted_list
 
