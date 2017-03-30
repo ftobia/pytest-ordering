@@ -172,10 +172,10 @@ def pytest_collection_modifyitems(session, config, items):
         length = len(before_item) + len(after_item)
     if length:
         sys.stdout.write("WARNING: can not execute test relative to others: ")
-        for label, entry in before_item:
+        for label, entry in before_item.items():
             sys.stdout.write( label + " ")
             sorted_list += entry
-        for label, entry in end_item:
+        for label, entry in end_item.items():
             sys.stdout.write( label + " ")
             sorted_list += entry
         sys.flush()
