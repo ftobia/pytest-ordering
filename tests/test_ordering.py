@@ -399,7 +399,7 @@ def test_false_insert(item_names_for):
     def test_first():
         pass
     """
-    assert item_names_for(test_content) == ['test_first', 'test_second', 'test_third', 'test_four', 'test_five']
+    assert item_names_for(test_content) == ['test_second', 'test_first', 'test_third']
 
 def test_run_marker_registered(capsys):
     pytest.main('--markers')
