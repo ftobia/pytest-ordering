@@ -178,7 +178,7 @@ def pytest_collection_modifyitems(session, config, items):
         for label, entry in after_item.items():
             sys.stdout.write( label + " ")
             sorted_list += entry
-        sys.flush()
+        sys.stdout.flush()
         print("enqueue them behind the others")
     
     items[:] = sorted_list
