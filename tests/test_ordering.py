@@ -271,7 +271,7 @@ def test_run_ordinals(item_names_for):
     test_content="""
     import pytest
 
-    @pytest.mark.run('second-to-last')
+    @pytest.mark.run('second_to_last')
     def test_three():
         pass
 
