@@ -44,10 +44,7 @@ def mark_binning(item, keys, start, end, before, after, unordered):
     find_order = match_order.search(",".join(keys))
     if find_order:
         order = int(find_order.group(1))
-        if order < 0:
-            end.setdefault(order, []).append(item)
-        else:
-            start.setdefault(order, []).append(item)
+        start.setdefault(order, []).append(item)
         return True
     elif "run" in keys:
         mark = item.get_marker('run')
@@ -62,11 +59,18 @@ def mark_binning(item, keys, start, end, before, after, unordered):
                 start.setdefault(order, []).append(item)
         elif before_mark:
             if "." not in before_mark:
-                before_mark = item.location[0].rsplit(os.sep, 1)[1][:-3] + "." + before_mark
+                prefix = item.location[0]
+                if os.sep in prefix:
+                    prefix = prefix.rsplit(os.sep, 1)[1]
+                before_mark = prefix[:-3] + "." + before_mark
             before.setdefault(before_mark, []).append(item)
         elif after_mark:
             if "." not in after_mark:
-                after_mark = item.location[0].rsplit(os.sep, 1)[1][:-3] + "." + after_mark
+                prefix = item.location[0]
+                if os.sep in prefix:
+                    prefix = prefix.rsplit(os.sep, 1)[1]
+                after_mark = prefix[:-3] + "." + after_mark
+
             after.setdefault(after_mark, []).append(item)
         else:
             for ordinal, position in orders_map.items():
@@ -91,10 +95,7 @@ def mark_binning(item, keys, start, end, before, after, unordered):
 
 def insert(items, sort):
     list_items = []
-    if isinstance(items, dict):
-        for key, values in items.items():
-            list_items += values
-    elif isinstance(items, tuple):
+    if isinstance(items, tuple):
         list_items = items[1]
     else:
         list_items = items
@@ -103,16 +104,25 @@ def insert(items, sort):
 def insert_before( name, items, sort):
     regex_name = re.escape(name) + r"(:?\.\w+)?$"
     for pos, item in enumerate(sort):
-        item_name =  item.location[0].rsplit(os.sep, 1)[1][:-3] + "." + item.location[2]
+        prefix = item.location[0]
+        if os.sep in prefix:
+            prefix = item.location[0].rsplit(os.sep, 1)[1]
+        item_name =  prefix[:-3] + "." + item.location[2]
         if re.match(regex_name, item_name):
-            sort[pos:1] = items
+            if pos == 0:
+                sort[:] = items + sort
+            else:
+                sort[pos:1] = items
             return True
     return False
 
 def insert_after(name, items, sort):
     regex_name = re.escape(name) + r"(:?\.\w+)?$"
     for pos, item in reversed(list(enumerate(sort))):
-        item_name =  item.location[0].rsplit(os.sep, 1)[1][:-3] + "." + item.location[2]
+        prefix = item.location[0]
+        if os.sep in prefix:
+            prefix = item.location[0].rsplit(os.sep, 1)[1]
+        item_name =  prefix[:-3] + "." + item.location[2]
         if re.match(regex_name, item_name):
             sort[pos+1:1] = items
             return True
@@ -150,7 +160,7 @@ def pytest_collection_modifyitems(session, config, items):
             if insert_before(label, before, sorted_list):
                 remove_labels.append(label)
         for label in remove_labels:
-            del before_item[remove_labels]
+            del before_item[label]
 
         remove_labels = []
         for label, after in after_item.items():
@@ -160,6 +170,16 @@ def pytest_collection_modifyitems(session, config, items):
             del after_item[label]
 
         length = len(before_item) + len(after_item)
+    if length:
+        sys.stdout.write("WARNING: can not execute test relative to others: ")
+        for label, entry in before_item:
+            sys.stdout.write( label + " ")
+            sorted_list += entry
+        for label, entry in end_item:
+            sys.stdout.write( label + " ")
+            sorted_list += entry
+        sys.flush()
+        print("enqueue them behind the others")
     
     items[:] = sorted_list
 

@@ -334,6 +334,73 @@ def test_relative(item_names_for):
     assert item_names_for(test_content) == ['test_first', 'test_second', 'test_third']
 
 
+def test_relative2(item_names_for):
+    test_content="""
+    import pytest
+
+    @pytest.mark.run(after='test_second')
+    def test_third():
+        pass
+
+    def test_second():
+        pass
+
+    @pytest.mark.run(before='test_second')
+    def test_first():
+        pass
+
+    def test_five():
+        pass
+
+    @pytest.mark.run(before='test_five')
+    def test_four():
+        pass
+
+    """
+    assert item_names_for(test_content) == ['test_first', 'test_second', 'test_third', 'test_four', 'test_five']
+
+def test_relative3(item_names_for):
+    test_content="""
+    import pytest
+
+    @pytest.mark.run(after='test_second')
+    def test_third():
+        pass
+
+    def test_second():
+        pass
+
+    @pytest.mark.run(before='test_second')
+    def test_first():
+        pass
+
+    def test_five():
+        pass
+
+    @pytest.mark.run(before='test_five')
+    def test_four():
+        pass
+
+    """
+    assert item_names_for(test_content) == ['test_first', 'test_second', 'test_third', 'test_four', 'test_five']
+
+def test_false_insert(item_names_for):
+    test_content="""
+    import pytest
+
+    @pytest.mark.run(after='test_a')
+    def test_third():
+        pass
+
+    def test_second():
+        pass
+
+    @pytest.mark.run(before='test_b')
+    def test_first():
+        pass
+    """
+    assert item_names_for(test_content) == ['test_first', 'test_second', 'test_third', 'test_four', 'test_five']
+
 def test_run_marker_registered(capsys):
     pytest.main('--markers')
     out, err = capsys.readouterr()
