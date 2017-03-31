@@ -4,7 +4,10 @@ from ._version import __version__
 import operator
 import re
 import pytest
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except:
+    from ordereddict import OrderedDict
 import os
 import sys
 
