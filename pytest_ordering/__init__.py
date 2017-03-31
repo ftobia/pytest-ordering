@@ -42,6 +42,13 @@ def pytest_configure(config):
     config.addinivalue_line('markers', config_line)
 
 
+def get_filename(item):
+    name = item.location[0]
+    if os.sep in name:
+        name = item.location[0].rsplit(os.sep, 1)[1]
+    return name[:-3]
+
+
 def mark_binning(item, keys, start, end, before, after, unordered):
     match_order = re.compile(r"order(\d+)(:?,|$)")
     find_order = match_order.search(",".join(keys))
@@ -62,17 +69,13 @@ def mark_binning(item, keys, start, end, before, after, unordered):
                 start.setdefault(order, []).append(item)
         elif before_mark:
             if "." not in before_mark:
-                prefix = item.location[0]
-                if os.sep in prefix:
-                    prefix = prefix.rsplit(os.sep, 1)[1]
-                before_mark = prefix[:-3] + "." + before_mark
+                prefix = get_filename(item)
+                before_mark = prefix + "." + before_mark
             before.setdefault(before_mark, []).append(item)
         elif after_mark:
             if "." not in after_mark:
-                prefix = item.location[0]
-                if os.sep in prefix:
-                    prefix = prefix.rsplit(os.sep, 1)[1]
-                after_mark = prefix[:-3] + "." + after_mark
+                prefix = get_filename(item)
+                after_mark = prefix + "." + after_mark
 
             after.setdefault(after_mark, []).append(item)
         else:
@@ -107,10 +110,8 @@ def insert(items, sort):
 def insert_before( name, items, sort):
     regex_name = re.escape(name) + r"(:?\.\w+)?$"
     for pos, item in enumerate(sort):
-        prefix = item.location[0]
-        if os.sep in prefix:
-            prefix = item.location[0].rsplit(os.sep, 1)[1]
-        item_name =  prefix[:-3] + "." + item.location[2]
+        prefix = get_filename(item)
+        item_name =  prefix + "." + item.location[2]
         if re.match(regex_name, item_name):
             if pos == 0:
                 sort[:] = items + sort
@@ -122,10 +123,8 @@ def insert_before( name, items, sort):
 def insert_after(name, items, sort):
     regex_name = re.escape(name) + r"(:?\.\w+)?$"
     for pos, item in reversed(list(enumerate(sort))):
-        prefix = item.location[0]
-        if os.sep in prefix:
-            prefix = item.location[0].rsplit(os.sep, 1)[1]
-        item_name =  prefix[:-3] + "." + item.location[2]
+        prefix = get_filename(item)
+        item_name =  prefix + "." + item.location[2]
         if re.match(regex_name, item_name):
             sort[pos+1:1] = items
             return True
