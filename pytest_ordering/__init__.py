@@ -42,13 +42,13 @@ def pytest_collection_modifyitems(session, config, items):
     for item in items:
 
         for mark_name, order in orders_map.items():
-            mark = item.get_marker(mark_name)
+            mark = item.get_closest_marker(mark_name)
 
             if mark:
                 item.add_marker(pytest.mark.run(order=order))
                 break
 
-        mark = item.get_marker('run')
+        mark = item.get_closest_marker('run')
 
         if mark:
             order = mark.kwargs.get('order')
