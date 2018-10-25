@@ -43,3 +43,9 @@ nosetests.xml
 
 # Misc
 .cache
+
+# PyCharm
+.idea/
+
+# pyenv
+.python-version
