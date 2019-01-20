@@ -26,7 +26,8 @@ orders_map = {
 
 
 def pytest_configure(config):
-    """Register the "run" marker."""
+    """Register the "run" marker and configur the plugin depending on the CLI
+    options"""
 
     config_line = (
         'run: specify ordering information for when tests should run '
@@ -34,9 +35,40 @@ def pytest_configure(config):
         'See also: http://pytest-ordering.readthedocs.org/'
     )
     config.addinivalue_line('markers', config_line)
+    if config.getoption('indulgent-ordering'):
+        # We need to dynamically add this `tryfirst` decorator to the plugin:
+        # only when the CLI option is present should the decorator be added.
+        # Thus, we manually run the decorator on the class function and
+        # manually replace it.
+        # Python 2.7 didn't allow arbitrary attributes on methods, so we have
+        # to keep the function as a function and then add it to the class as a
+        # pseudomethod.  Since the class is purely for structuring and `self`
+        # is never referenced, this seems reasonable.
+        OrderingPlugin.pytest_collection_modifyitems = pytest.hookimpl(
+                function=modify_items, tryfirst=True)
+    else:
+        OrderingPlugin.pytest_collection_modifyitems = pytest.hookimpl(
+                function=modify_items, trylast=True)
+    config.pluginmanager.register(OrderingPlugin(), 'orderingplugin')
 
 
-def pytest_collection_modifyitems(session, config, items):
+def pytest_addoption(parser):
+    """Set up CLI option for pytest"""
+    group = parser.getgroup('ordering')
+    group.addoption('--indulgent-ordering', action='store_true',
+                     dest='indulgent-ordering', help='''Request that the sort \
+order provided by pytest-ordering be applied before other sorting, allowing the \
+other sorting to have priority''')
+
+class OrderingPlugin:
+    """
+    Plugin implementation
+
+    By putting this in a class, we are able to dynamically register it after
+    the CLI is parsed.
+    """
+
+def modify_items(session, config, items):
     grouped_items = {}
 
     for item in items:
