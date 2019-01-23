@@ -1,7 +1,7 @@
 Unreleased
 ---
 ### Added
-- #?? Add ``--indulgent-ordering`` to request that the sort from
+- #50 Add ``--indulgent-ordering`` to request that the sort from
   pytest-ordering be run before other plugins.  This allows the built-in
   ``--failed-first`` implementation to override the ordering.
 
