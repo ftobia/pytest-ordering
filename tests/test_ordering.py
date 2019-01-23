@@ -269,6 +269,6 @@ def test_order_mark_class(item_names_for):
 
 
 def test_run_marker_registered(capsys):
-    pytest.main('--markers')
+    pytest.main(['--markers'])
     out, err = capsys.readouterr()
     assert '@pytest.mark.run' in out
