@@ -114,6 +114,21 @@ You can also use markers such as "first", "second", "last", and "second_to_last"
 
     =========================== 4 passed in 0.02 seconds ===========================
 
+``--indulgent-ordering`` and overriding ordering
+-------------
+
+You may sometimes find that you want to suggest an ordering of tests, while
+allowing it to be overridden for good reson. For example, if you run your test
+suite in parallel and have a number of tests which are particularly slow, it
+might be desirable to start those tests running first, in order to optimize
+your completion time. You can use the pytest-ordering plugin to inform pytest
+of this. Now suppose you also want to prioritize tests which failed during the
+previous run, by using the ``--failed-first`` option. By default,
+pytest-ordering will override the ``--failed-first`` order, but by adding the
+``--indulgent-ordering`` option, you can ask pytest to run the sort from
+pytest-ordering *before* the sort from ``--failed-first``, allowing the failed
+tests to be sorted to the front.
+
 
 Aspirational
 ============
