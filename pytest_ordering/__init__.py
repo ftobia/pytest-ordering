@@ -26,7 +26,7 @@ orders_map = {
 
 
 def pytest_configure(config):
-    """Register the "run" marker and configur the plugin depending on the CLI
+    """Register the "run" marker and configure the plugin depending on the CLI
     options"""
 
     config_line = (
