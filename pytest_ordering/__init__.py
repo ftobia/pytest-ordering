@@ -60,7 +60,7 @@ def pytest_addoption(parser):
 order provided by pytest-ordering be applied before other sorting, allowing the \
 other sorting to have priority''')
 
-class OrderingPlugin:
+class OrderingPlugin(object):
     """
     Plugin implementation
 
