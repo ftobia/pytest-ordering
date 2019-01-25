@@ -14,16 +14,16 @@ def test_run_marker_registered(capsys, tmpdir):
             """
 import pytest
 
-@pytest.mark.first
-def test_me_first():
-    assert True
-
 @pytest.mark.second
 def test_me_second():
     assert True
 
 def test_that_fails():
     assert False
+
+@pytest.mark.first
+def test_me_first():
+    assert True
 """
         )
     args = ["--quiet", "--color=no", testname]
