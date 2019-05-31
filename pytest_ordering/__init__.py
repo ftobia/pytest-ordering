@@ -28,12 +28,22 @@ orders_map = {
 def pytest_configure(config):
     """Register the "run" marker."""
 
-    config_line = (
-        'run: specify ordering information for when tests should run '
-        'in relation to one another. Provided by pytest-ordering. '
+    provided_by_pytest_ordering = (
+        'Provided by pytest-ordering. '
         'See also: http://pytest-ordering.readthedocs.org/'
     )
+
+    config_line = (
+        'run: specify ordering information for when tests should run '
+        'in relation to one another. ' + provided_by_pytest_ordering
+    )
     config.addinivalue_line('markers', config_line)
+
+    for mark_name in orders_map.keys():
+        config_line = '{}: run test {}. {}'.format(mark_name,
+                                                   mark_name.replace('_', ' '),
+                                                   provided_by_pytest_ordering)
+        config.addinivalue_line('markers', config_line)
 
 
 def pytest_collection_modifyitems(session, config, items):

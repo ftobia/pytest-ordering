@@ -1,16 +1,18 @@
+dist: xenial
 language: python
-python: "3.5"
-env:
-  - TOX_ENV=py35
-  - TOX_ENV=py34
-  - TOX_ENV=py33
-  - TOX_ENV=py27
-  - TOX_ENV=py26
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "pypy"
 install:
   - pip install tox
   - pip install python-coveralls
 script:
-  - tox -e $TOX_ENV
+  - TOX_PYTHON_VERSION=$(if [ $TRAVIS_PYTHON_VERSION = "pypy" ]; then echo "pypy"; else echo py$TRAVIS_PYTHON_VERSION | tr -d .; fi)
+  - tox -e $(tox -l | grep $TOX_PYTHON_VERSION | paste -sd "," -)
 after_success:
-  coveralls
+  - coveralls
 sudo: false
