@@ -268,7 +268,10 @@ def test_order_mark_class(item_names_for):
     assert item_names_for(tests_content) == ['test_3', 'test_4', 'test_5', 'test_1', 'test_2']
 
 
-def test_run_marker_registered(capsys):
-    pytest.main('--markers')
+def test_markers_registered(capsys):
+    pytest.main(['--markers'])
     out, err = capsys.readouterr()
     assert '@pytest.mark.run' in out
+    assert '@pytest.mark.first' in out
+    assert '@pytest.mark.last' in out
+    assert out.count('Provided by pytest-ordering') == 17
