@@ -34,12 +34,22 @@ orders_map = {
 def pytest_configure(config):
     """Register the "run" marker."""
 
-    config_line = (
-        'run: specify ordering information for when tests should run '
-        'in relation to one another. Provided by pytest-ordering. '
+    provided_by_pytest_ordering = (
+        'Provided by pytest-ordering. '
         'See also: http://pytest-ordering.readthedocs.org/'
     )
+
+    config_line = (
+        'run: specify ordering information for when tests should run '
+        'in relation to one another. ' + provided_by_pytest_ordering
+    )
     config.addinivalue_line('markers', config_line)
+
+    for mark_name in orders_map.keys():
+        config_line = '{}: run test {}. {}'.format(mark_name,
+                                                   mark_name.replace('_', ' '),
+                                                   provided_by_pytest_ordering)
+        config.addinivalue_line('markers', config_line)
 
 
 def get_filename(item):
@@ -57,7 +67,7 @@ def mark_binning(item, keys, start, end, before, after, unordered):
         start.setdefault(order, []).append(item)
         return True
     elif "run" in keys:
-        mark = item.get_marker('run')
+        mark = item.get_closest_marker('run')
         order = mark.kwargs.get('order')
         before_mark = mark.kwargs.get('before')
         after_mark = mark.kwargs.get('after')
@@ -88,7 +98,7 @@ def mark_binning(item, keys, start, end, before, after, unordered):
                     break
         return True
     for mark_name, order in orders_map.items():
-        mark = item.get_marker(mark_name)
+        mark = item.get_closest_marker(mark_name)
         if mark:
             order = int(order)
             if order < 0:
@@ -182,6 +192,6 @@ def pytest_collection_modifyitems(session, config, items):
             sorted_list += entry
         sys.stdout.flush()
         print("enqueue them behind the others")
-    
+
     items[:] = sorted_list
 

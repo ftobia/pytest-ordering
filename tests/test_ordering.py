@@ -300,7 +300,7 @@ def test_quickstart(item_names_for):
     def test_bar():
         pass
     """
-    assert item_names_for(test_content) == ['test_foo', 'test_bar']    
+    assert item_names_for(test_content) == ['test_foo', 'test_bar']
 
 def test_quickstart2(item_names_for):
     test_content="""
@@ -314,7 +314,7 @@ def test_quickstart2(item_names_for):
     def test_bar():
         pass
     """
-    assert item_names_for(test_content) == ['test_bar', 'test_foo']    
+    assert item_names_for(test_content) == ['test_bar', 'test_foo']
 
 def test_relative(item_names_for):
     test_content="""
@@ -401,8 +401,10 @@ def test_false_insert(item_names_for):
     """
     assert item_names_for(test_content) == ['test_second', 'test_first', 'test_third']
 
-def test_run_marker_registered(capsys):
-    pytest.main('--markers')
+def test_markers_registered(capsys):
+    pytest.main(['--markers'])
     out, err = capsys.readouterr()
     assert '@pytest.mark.run' in out
-
+    assert '@pytest.mark.first' in out
+    assert '@pytest.mark.last' in out
+    assert out.count('Provided by pytest-ordering') == 17

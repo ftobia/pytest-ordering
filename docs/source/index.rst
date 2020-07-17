@@ -16,6 +16,12 @@ second-to-last) or relative (i.e. run this test before this other test).
  you read here isn't currently implemented, rest assured that I am working
  on it (or feel free to ping me: https://github.com/ftobia)
 
+Supported python and pytest versions
+------------------------------------
+
+pytest-ordering supports python 2.7, 3.4, 3.5, 3.6, 3.7, and pypy, and is
+compatible with pytest 3.6.0 or newer.
+
 
 Quickstart
 ----------
