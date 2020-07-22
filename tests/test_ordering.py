@@ -268,6 +268,21 @@ def test_order_mark_class(item_names_for):
     assert item_names_for(tests_content) == ['test_3', 'test_4', 'test_5', 'test_1', 'test_2']
 
 
+def test_relative_to_other_tests(item_names_for):
+    tests_content = """
+    import pytest
+    
+    @pytest.mark.run(after='test_2')
+    def test_3(): pass
+
+    def test_2(): pass
+
+    @pytest.mark.run(before='test_2')
+    def test_1(): pass
+    """
+    assert item_names_for(tests_content) == ['test_1', 'test_2', 'test_3']
+
+
 def test_markers_registered(capsys):
     pytest.main(['--markers'])
     out, err = capsys.readouterr()
