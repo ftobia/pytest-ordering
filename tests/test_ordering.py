@@ -312,10 +312,12 @@ def test_relative_to_other_invalid_tests(item_names_for):
     """
     
     with warnings.catch_warnings(record=True) as catched_warnings:
-        assert item_names_for(tests_content) == [
+        expected_item_names = [
             'test_2', 'test_1', 'test_4', 'test_5',
             'test_6', 'test_3', 'test_7', 'test_8',
         ]
+        for item_name in item_names_for(tests_content):
+            assert item_name in expected_item_names
         
         expected_warning_messages = [
             "test_A, indicated at parameter before of test_1, doesn't exist",
