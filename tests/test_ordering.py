@@ -318,10 +318,10 @@ def test_relative_to_other_invalid_tests(item_names_for):
         ]
         
         expected_warning_messages = [
-            "test_A test, indicated at parameter before of test_1 test, doesn't exists",
-            "test_B test, indicated at parameter after of test_3 test, doesn't exists",
-            "test_C test, indicated at parameter before of test_4, test_5 and test_6 tests, doesn't exists",
-            "test_D test, indicated at parameter after of test_7 and test_8 tests, doesn't exists",
+            "test_A, indicated at parameter before of test_1, doesn't exists",
+            "test_B, indicated at parameter after of test_3, doesn't exists",
+            "test_C, indicated at parameter before of test_4, test_5 and test_6, doesn't exists",
+            "test_D, indicated at parameter after of test_7 and test_8, doesn't exists",
         ]
         
         n_other_warnings = 0        

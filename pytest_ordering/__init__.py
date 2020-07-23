@@ -107,13 +107,13 @@ def pytest_collection_modifyitems(session, config, items):
                 items.insert(index, before_item)
         else:
             if len(_before_items) == 1:
-                message_schema = "%s test, indicated at parameter before of" \
-                               + " %s test, doesn't exists"
+                message_schema = "%s, indicated at parameter before of" \
+                               + " %s, doesn't exists"
                 message = message_schema % (before_item_relative,
                                             _before_items[0].name)
             else:
-                message_schema = "%s test, indicated at parameter before of" \
-                               + " %s tests, doesn't exists"
+                message_schema = "%s, indicated at parameter before of" \
+                               + " %s, doesn't exists"
                 test_names = ""
                 for i, before_item in enumerate(_before_items):
                     test_names += before_item.name
@@ -131,13 +131,13 @@ def pytest_collection_modifyitems(session, config, items):
                 items.insert(index+1, after_item)
         else:
             if len(_after_items) == 1:
-                message_schema = "%s test, indicated at parameter after of" \
-                               + " %s test, doesn't exists"
+                message_schema = "%s, indicated at parameter after of" \
+                               + " %s, doesn't exists"
                 message = message_schema % (after_item_relative,
                                             _after_items[0].name)
             else:
-                message_schema = "%s test, indicated at parameter after of" \
-                               + " %s tests, doesn't exists"
+                message_schema = "%s, indicated at parameter after of" \
+                               + " %s, doesn't exists"
                 test_names = ""
                 for i, after_item in enumerate(_after_items):
                     test_names += after_item.name
