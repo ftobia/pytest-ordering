@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import warnings
 
 import pytest
 
@@ -281,6 +282,55 @@ def test_relative_to_other_tests(item_names_for):
     def test_1(): pass
     """
     assert item_names_for(tests_content) == ['test_1', 'test_2', 'test_3']
+
+def test_relative_to_other_invalid_tests(item_names_for):
+    tests_content = """
+    import pytest
+
+    @pytest.mark.run(before='test_A')
+    def test_1(): pass
+
+    def test_2(): pass
+    
+    @pytest.mark.run(after='test_B')
+    def test_3(): pass
+    
+    @pytest.mark.run(before='test_C')
+    def test_4(): pass
+    
+    @pytest.mark.run(before='test_C')
+    def test_5(): pass
+    
+    @pytest.mark.run(before='test_C')
+    def test_6(): pass
+    
+    @pytest.mark.run(after='test_D')
+    def test_7(): pass
+    
+    @pytest.mark.run(after='test_D')
+    def test_8(): pass
+    """
+    
+    with warnings.catch_warnings(record=True) as catched_warnings:
+        assert item_names_for(tests_content) == [
+            'test_2', 'test_1', 'test_4', 'test_5',
+            'test_6', 'test_3', 'test_7', 'test_8',
+        ]
+        
+        expected_warning_messages = [
+            "test_A test, indicated at parameter before of test_1 test, doesn't exists",
+            "test_B test, indicated at parameter after of test_3 test, doesn't exists",
+            "test_C test, indicated at parameter before of test_4, test_5 and test_6 tests, doesn't exists",
+            "test_D test, indicated at parameter after of test_7 and test_8 tests, doesn't exists",
+        ]
+        
+        n_other_warnings = 0        
+        for w in catched_warnings:
+            if not issubclass(w.category, SyntaxWarning):
+                n_other_warnings += 1
+                continue
+            assert w.message.__str__() in expected_warning_messages
+        assert len(expected_warning_messages) + n_other_warnings == len(catched_warnings)
 
 
 def test_markers_registered(capsys):

@@ -121,6 +121,47 @@ You can also use markers such as "first", "second", "last", and "second_to_last"
     =========================== 4 passed in 0.02 seconds ===========================
 
 
+Relative to other tests
+-----------------------
+
+Tests can be defined relative to others with "before" and "after" parameters.
+
+.. code:: python
+
+ import pytest
+
+ @pytest.mark.run(after='test_second')
+ def test_third():
+     assert True
+
+ def test_second():
+     assert True
+
+ @pytest.mark.run(before='test_second')
+     def test_first():
+         assert True
+
+::
+
+    $ py.test test_foo.py -vv
+    ============================= test session starts ==============================
+    platform darwin -- Python 2.7.5 -- py-1.4.20 -- pytest-2.5.2 -- env/bin/python
+    plugins: ordering
+    collected 3 items
+
+    test_foo.py:11: test_first PASSED
+    test_foo.py:7: test_second PASSED
+    test_foo.py:4: test_third PASSED
+
+    =========================== 4 passed in 0.02 seconds ===========================
+
+
+
+    .. toctree::
+       :maxdepth: 2
+
+    .. _markers: https://pytest.org/latest/mark.html
+
 Aspirational
 ============
 
@@ -203,45 +244,4 @@ By number
     test_foo.py:7: test_four PASSED
 
     =========================== 4 passed in 0.02 seconds ===========================
-
-
-Relative to other tests
------------------------
-
-
-.. code:: python
-
- import pytest
-
- @pytest.mark.run(after='test_second')
- def test_third():
-     assert True
-
- def test_second():
-     assert True
-
- @pytest.mark.run(before='test_second')
- def test_first():
-     assert True
-
-::
-
-    $ py.test test_foo.py -vv
-    ============================= test session starts ==============================
-    platform darwin -- Python 2.7.5 -- py-1.4.20 -- pytest-2.5.2 -- env/bin/python
-    plugins: ordering
-    collected 3 items
-
-    test_foo.py:11: test_first PASSED
-    test_foo.py:7: test_second PASSED
-    test_foo.py:4: test_third PASSED
-
-    =========================== 4 passed in 0.02 seconds ===========================
-
-
-
-.. toctree::
-   :maxdepth: 2
-
-.. _markers: https://pytest.org/latest/mark.html
 

@@ -2,6 +2,7 @@
 from ._version import __version__
 
 import operator
+import warnings
 
 import pytest
 
@@ -47,8 +48,7 @@ def pytest_configure(config):
 
 
 def pytest_collection_modifyitems(session, config, items):
-    grouped_items = {}
-    before_items, after_items = ({}, {})
+    grouped_items, before_items, after_items = ({}, {}, {})
 
     for item in items:
 
@@ -66,16 +66,12 @@ def pytest_collection_modifyitems(session, config, items):
             if order is None:
                 before = mark.kwargs.get('before')
                 if before:
-                    if not before in before_items:
-                        before_items[before] = []
-                    before_items[before].append(item)
+                    before_items.setdefault(before, []).append(item)
                     continue
                 
                 after = mark.kwargs.get('after')
                 if after:
-                    if not after in after_items:
-                        after_items[after] = []
-                    after_items[after].append(item)
+                    after_items.setdefault(after, []).append(item)
                     continue
         else:
             order = None
@@ -99,7 +95,7 @@ def pytest_collection_modifyitems(session, config, items):
     def _get_item_index_by_name(item_name):
         index = None
         for i, item in enumerate(items):
-            if getattr(item, "name") == item_name:
+            if getattr(item, 'name') == item_name:
                 index = i
                 break
         return index
@@ -109,8 +105,46 @@ def pytest_collection_modifyitems(session, config, items):
         if index is not None:
             for before_item in _before_items:
                 items.insert(index, before_item)
+        else:
+            if len(_before_items) == 1:
+                message_schema = "%s test, indicated at parameter before of" \
+                               + " %s test, doesn't exists"
+                message = message_schema % (before_item_relative,
+                                            _before_items[0].name)
+            else:
+                message_schema = "%s test, indicated at parameter before of" \
+                               + " %s tests, doesn't exists"
+                test_names = ""
+                for i, before_item in enumerate(_before_items):
+                    test_names += before_item.name
+                    if i < len(_before_items) - 2:
+                        test_names += ", "
+                    elif i == len(_before_items) - 2:
+                        test_names += " and "
+                message = message_schema % (before_item_relative, test_names)
+            warnings.warn(message, SyntaxWarning)
+            items.extend(_before_items)
     for after_item_relative, _after_items in after_items.items():
         index = _get_item_index_by_name(after_item_relative)
         if index is not None:
             for after_item in _after_items:
                 items.insert(index+1, after_item)
+        else:
+            if len(_after_items) == 1:
+                message_schema = "%s test, indicated at parameter after of" \
+                               + " %s test, doesn't exists"
+                message = message_schema % (after_item_relative,
+                                            _after_items[0].name)
+            else:
+                message_schema = "%s test, indicated at parameter after of" \
+                               + " %s tests, doesn't exists"
+                test_names = ""
+                for i, after_item in enumerate(_after_items):
+                    test_names += after_item.name
+                    if i < len(_after_items) - 2:
+                        test_names += ", "
+                    elif i == len(_after_items) - 2:
+                        test_names += " and "
+                message = message_schema % (after_item_relative, test_names)
+            warnings.warn(message, SyntaxWarning)
+            items.extend(_after_items)
