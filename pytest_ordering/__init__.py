@@ -68,15 +68,30 @@ def pytest_collection_modifyitems(session, config, items):
         grouped_items.setdefault(order, []).append(item)
 
     sorted_items = []
-    unordered_items = [grouped_items.pop(None, [])]
+    unordered_items = grouped_items.pop(None, [])
 
     start_list = sorted((i for i in grouped_items.items() if i[0] >= 0),
                         key=operator.itemgetter(0))
-    end_list = sorted((i for i in grouped_items.items() if i[0] < 0),
-                      key=operator.itemgetter(0))
 
-    sorted_items.extend([i[1] for i in start_list])
+    index = 0
+    for i, item_list in start_list:
+        while i > index and unordered_items:
+            sorted_items.append(unordered_items.pop(0))
+            index += 1
+        sorted_items.extend(item_list)
+        index += len(item_list)
+
+    end_list = reversed(sorted((i for i in grouped_items.items() if i[0] < 0),
+                               key=operator.itemgetter(0)))
+    index = -1
+    sorted_end_list = []
+    for i, item_list in end_list:
+        while i < index and unordered_items:
+            sorted_end_list.append(unordered_items.pop())
+            index -= 1
+        sorted_end_list.extend(reversed(item_list))
+        index -= len(item_list)
+
     sorted_items.extend(unordered_items)
-    sorted_items.extend([i[1] for i in end_list])
-
-    items[:] = [item for sublist in sorted_items for item in sublist]
+    sorted_items.extend(reversed(sorted_end_list))
+    items[:] = sorted_items
