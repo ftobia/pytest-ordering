@@ -57,11 +57,11 @@ With pytest-ordering, you can change the default ordering as follows:
 
  import pytest
 
- @pytest.mark.order2
+ @pytest.mark.run(order=1)
  def test_foo():
      assert True
 
- @pytest.mark.order1
+ @pytest.mark.run(order=0)
  def test_bar():
      assert True
 
@@ -79,6 +79,37 @@ With pytest-ordering, you can change the default ordering as follows:
     =========================== 2 passed in 0.01 seconds ===========================
 
 This is a trivial example, but ordering is respected across test files.
+
+Negative ordinals
+-----------------
+
+Just like a list index in Python, negative ordinals count from the end, e.g.
+the ordinal -1 designates the last test, -2 the second to last etc.:
+
+.. code:: python
+
+ import pytest
+
+ @pytest.mark.run(order=-2)
+ def test_foo():
+     assert True
+
+ @pytest.mark.run(order=-1)
+ def test_bar():
+     assert True
+
+::
+
+    $ py.test test_foo.py -vv
+    ============================= test session starts ==============================
+    platform darwin -- Python 2.7.5 -- py-1.4.20 -- pytest-2.5.2 -- env/bin/python
+    plugins: ordering
+    collected 2 items
+
+    test_foo.py:7: test_bar PASSED
+    test_foo.py:3: test_foo PASSED
+
+    =========================== 2 passed in 0.01 seconds ===========================
 
 Other markers
 -------------
@@ -120,6 +151,77 @@ You can also use markers such as "first", "second", "last", and "second_to_last"
 
     =========================== 4 passed in 0.02 seconds ===========================
 
+Sparse ordinals
+---------------
+Both when using ordinal numbers and when using keywords as shown above, you
+can leave out some of the numbers. If there are unmarked tests, they will
+fill in the gaps. Consider this (note that the ordinals are 0-based):
+
+.. code:: python
+
+    import pytest
+
+    @pytest.mark.run(order=2)
+    def test_1():
+        assert True
+
+    def test_2():
+        assert True
+
+    def test_3():
+        assert True
+
+    @pytest.mark.run(order=0)
+    def test_4():
+        assert True
+
+::
+
+    $ py.test test_foo.py -vv
+    ================================================= test session starts =================================================
+    platform win32 -- Python 3.7.1, pytest-5.4.3, py-1.8.1, pluggy-0.13.1 -- c:\dev\venv\py37_test\scripts\python.exe
+    collected 4 items
+
+    test_ordering.py::test_4 PASSED                                                                                  [ 25%]
+    test_ordering.py::test_2 PASSED                                                                                  [ 50%]
+    test_ordering.py::test_1 PASSED                                                                                  [ 75%]
+    test_ordering.py::test_3 PASSED                                                                                  [100%]
+
+    ================================================== 4 passed in 0.08s ==================================================
+
+This also works for negative numbers:
+
+.. code:: python
+
+    import pytest
+
+    @pytest.mark.run(order=-3)
+    def test_1():
+        assert True
+
+    def test_2():
+        assert True
+
+    def test_3():
+        assert True
+
+    @pytest.mark.run(order=-1)
+    def test_4():
+        assert True
+
+::
+
+    $ py.test test_foo.py -vv
+    ================================================= test session starts =================================================
+    platform win32 -- Python 3.7.1, pytest-5.4.3, py-1.8.1, pluggy-0.13.1 -- c:\dev\venv\py37_test\scripts\python.exe
+    collected 4 items
+
+    test_ordering.py::test_2 PASSED                                                                                  [ 25%]
+    test_ordering.py::test_1 PASSED                                                                                  [ 50%]
+    test_ordering.py::test_3 PASSED                                                                                  [ 75%]
+    test_ordering.py::test_4 PASSED                                                                                  [100%]
+
+    ================================================== 4 passed in 0.07s ==================================================
 
 Aspirational
 ============
@@ -147,45 +249,6 @@ Ordinals
      assert True
 
  @pytest.mark.run('first')
- def test_one():
-     assert True
-
-::
-
-    $ py.test test_foo.py -vv
-    ============================= test session starts ==============================
-    platform darwin -- Python 2.7.5 -- py-1.4.20 -- pytest-2.5.2 -- env/bin/python
-    plugins: ordering
-    collected 4 items
-
-    test_foo.py:17: test_one PASSED
-    test_foo.py:12: test_two PASSED
-    test_foo.py:3: test_three PASSED
-    test_foo.py:7: test_four PASSED
-
-    =========================== 4 passed in 0.02 seconds ===========================
-
-
-By number
----------
-
-.. code:: python
-
- import pytest
-
- @pytest.mark.run(order=-2)
- def test_three():
-     assert True
-
- @pytest.mark.run(order=-1)
- def test_four():
-     assert True
-
- @pytest.mark.run(order=2)
- def test_two():
-     assert True
-
- @pytest.mark.run(order=1)
  def test_one():
      assert True
 
