@@ -46,6 +46,7 @@ def pytest_configure(config):
         config.addinivalue_line('markers', config_line)
 
 
+@pytest.hookimpl(trylast=True)
 def pytest_collection_modifyitems(session, config, items):
     grouped_items = {}
 
