@@ -1,3 +1,5 @@
+pytest-ordering is no longer maintained, please use https://pypi.org/project/pytest-order/
+
 pytest-ordering
 ===============
 
