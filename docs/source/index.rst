@@ -57,11 +57,11 @@ With pytest-ordering, you can change the default ordering as follows:
 
  import pytest
 
- @pytest.mark.order2
+ @pytest.mark.run(order=2)
  def test_foo():
      assert True
 
- @pytest.mark.order1
+ @pytest.mark.run(order=1)
  def test_bar():
      assert True
 
